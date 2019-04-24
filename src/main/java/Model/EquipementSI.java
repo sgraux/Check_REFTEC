@@ -29,6 +29,11 @@ public class EquipementSI {
         else if(parStatut.equals("Validé")) nbValide++;
     }
 
+    public int[] getTabEtape(){
+        int[] tab = {nbNonApplicable, nbE0, nbE1, nbE2, nbE3, nbValide};
+        return tab;
+    }
+
     public String getCodeBM() {
         return codeBM;
     }

@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 
+import Data.Data;
 import Model.ReftecReader;
+import Model.Station;
 import com.itextpdf.text.*;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.DocumentException;
@@ -30,6 +32,7 @@ public class PDFCreator {
     private static ReftecReader reader;
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
+    private static Data data = new Data();
 
     public  PDFCreator(String parPath)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
         generatePDF(parPath);
@@ -62,7 +65,7 @@ public class PDFCreator {
     public static PdfPTable createTable() throws DocumentException {
 
         // create 6 column table
-        PdfPTable table = new PdfPTable(7);
+        PdfPTable table = new PdfPTable(8);
 
         // set the width of the table to 100% of page
         table.setWidthPercentage(100);
@@ -74,17 +77,20 @@ public class PDFCreator {
         for(String[] tab : list){
             for(int i = 0; i < tab.length; i++){
                 if(i == 0)
-                    table.addCell(createValueCell(tab[i], true));
+                    table.addCell(createStationCell(tab[i]));
                 else
-                    table.addCell(createValueCell(tab[i], false));
+                    table.addCell(createValueCell(tab[i]));
             }
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
-        table.addCell(createValueCell("Totaux", true));
+        table.addCell(createStationCell("Totaux"));
         for(int i : tab){
-            table.addCell(createValueCell(""+i, true));
+            table.addCell(createTotalCell(""+i));
         }
 
+        if(reader.getREFTECLigne().getListeStations().size() == 1){
+            addDetailEquipStation(table);
+        }
         return table;
     }
 
@@ -92,6 +98,7 @@ public class PDFCreator {
         Font font = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK);
         // create header cell
         PdfPCell cellHeader = new PdfPCell(new Phrase("Extract REFTEC ligne : " + parLigne,font));
+        PdfPCell cellCodes = new PdfPCell(new Phrase(data.toStringCodesParEquip(),font));
         PdfPCell cellStation = new PdfPCell(new Phrase("Station",font));
         PdfPCell cellNonApp = new PdfPCell(new Phrase("Non Applicable",font));
         PdfPCell cellE0 = new PdfPCell(new Phrase("Etape 0",font));
@@ -100,8 +107,9 @@ public class PDFCreator {
         PdfPCell cellE3 = new PdfPCell(new Phrase("Etape 3",font));
         PdfPCell cellValide = new PdfPCell(new Phrase("Validé",font));
 
-        cellHeader.setColspan(7);
-        cellStation.setColspan(1);
+        cellHeader.setColspan(8);
+        cellCodes.setColspan(8);
+        cellStation.setColspan(2);
         cellNonApp.setColspan(1);
         cellE0.setColspan(1);
         cellE1.setColspan(1);
@@ -110,17 +118,20 @@ public class PDFCreator {
         cellValide.setColspan(1);
 
         // set style
-        Style.headerCellStyle(cellHeader, 1);
-        Style.headerCellStyle(cellStation, 0);
-        Style.headerCellStyle(cellNonApp, 0);
-        Style.headerCellStyle(cellE0, 0);
-        Style.headerCellStyle(cellE1, 0);
-        Style.headerCellStyle(cellE2, 0);
-        Style.headerCellStyle(cellE3, 0);
-        Style.headerCellStyle(cellValide, 0);
+        Style.headerCellStyle(cellHeader, parLigne);
+        Style.headerCellStyle(cellCodes, "NA");
+        cellCodes.setHorizontalAlignment(Element.ALIGN_LEFT);
+        Style.headerCellStyle(cellStation, "NA");
+        Style.headerCellStyle(cellNonApp, "NA");
+        Style.headerCellStyle(cellE0, "NA");
+        Style.headerCellStyle(cellE1, "NA");
+        Style.headerCellStyle(cellE2, "NA");
+        Style.headerCellStyle(cellE3, "NA");
+        Style.headerCellStyle(cellValide, "NA");
 
         // add to table
         parTable.addCell(cellHeader);
+        parTable.addCell(cellCodes);
         parTable.addCell(cellStation);
         parTable.addCell(cellNonApp);
         parTable.addCell(cellE0);
@@ -130,21 +141,19 @@ public class PDFCreator {
         parTable.addCell(cellValide);
     }
 
-    // create cells
-    private static PdfPCell createLabelCell(String text){
+    private static PdfPCell createStationCell(String text){
         // font
-        Font font = new Font(FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.DARK_GRAY);
+        Font font = new Font(FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.BLACK);
 
-        // create cell
         PdfPCell cell = new PdfPCell(new Phrase(text,font));
+        cell.setColspan(2);
 
         // set style
-        Style.labelCellStyle(cell);
+        Style.stationCellStyle(cell);
         return cell;
     }
 
-    // create cells
-    private static PdfPCell createValueCell(String text, boolean parStation){
+    private static PdfPCell createValueCell(String text){
         // font
         Font font = new Font(FontFamily.HELVETICA, 8, Font.NORMAL, BaseColor.BLACK);
 
@@ -152,7 +161,31 @@ public class PDFCreator {
         PdfPCell cell = new PdfPCell(new Phrase(text,font));
 
         // set style
-        Style.valueCellStyle(cell, parStation);
+        Style.valueCellStyle(cell);
         return cell;
+    }
+
+    private static PdfPCell createTotalCell(String text){
+        // font
+        Font font = new Font(FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.BLACK);
+
+        PdfPCell cell = new PdfPCell(new Phrase(text,font));
+        cell.setColspan(1);
+
+        // set style
+        Style.stationCellStyle(cell);
+        return cell;
+    }
+
+    private static void addDetailEquipStation(PdfPTable parTable){
+
+        Station station = reader.getREFTECLigne().getListeStations().get(0);
+        for(String s : data.getListeNomBM()){
+            parTable.addCell(createStationCell(s));
+            for(int i : station.getEtapeBM(s)){
+                parTable.addCell(createValueCell(""+i));
+            }
+        }
+
     }
 }

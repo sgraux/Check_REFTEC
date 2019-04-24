@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
 public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
@@ -92,6 +95,14 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
             REFTECLigne.manageLieu(lieu,familleBM,statut);
             countCell = 0;
         }
+
+        Collections.sort(REFTECLigne.getListeStations(), new Comparator<Station>() {
+            public int compare(Station s1, Station s2)
+            {
+
+                return  s1.getNom().compareTo(s2.getNom());
+            }
+        });
         System.out.println(testCountRows);
     }
 

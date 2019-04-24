@@ -5,7 +5,7 @@ import Data.Data;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Station {
+public class Station implements Comparable<Station>{
 
     private String nom;
     private ArrayList<EquipementSI> listeEquipementSI;
@@ -57,6 +57,66 @@ public class Station {
         return tabSommeEtapeEquip;
     }
 
+    public int[] getEtapeCodeBM(String parCodeBM){
+        int[] res = {0, 0, 0, 0, 0, 0};
+        for(EquipementSI equip : listeEquipementSI){
+            if(equip.getCodeBM().equals(parCodeBM)) return equip.getTabEtape();
+        }
+        return res;
+    }
+
+    public int[] getEtapeBM(String familleBM){
+        int[] res = new int[6];
+        int[] temp;
+
+        for(int i = 0; i < 6; i++) res[i] = 0;
+
+        if(familleBM.equals("Armoires")) res = this.getEtapeCodeBM("ARFO");
+
+        else if(familleBM.equals("Centrales")){
+            for(int i = 0; i < data.getCentrales().length; i++){
+                temp = this.getEtapeCodeBM(data.getCentrales()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+        else if(familleBM.equals("Telesonorisation")){
+            for(int i = 0; i < data.getTelesono().length; i++){
+                temp = this.getEtapeCodeBM(data.getTelesono()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+        else if(familleBM.equals("Caméras")){
+            for(int i = 0; i < data.getVideo().length; i++){
+                temp = this.getEtapeCodeBM(data.getVideo()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+        else if(familleBM.equals("Sonorisation")){
+            for(int i = 0; i < data.getSon().length; i++){
+                temp = this.getEtapeCodeBM(data.getSon()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+        else if(familleBM.equals("Interphones")){
+            for(int i = 0; i < data.getPhones().length; i++){
+                temp = this.getEtapeCodeBM(data.getPhones()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+
+        return res;
+    }
+
     public String getNom() {
         return nom;
     }
@@ -76,5 +136,9 @@ public class Station {
     public String toString(){
         int[] temp = getSommeEtapeEquip();
         return nom + "| " + temp[0] + " | " + temp[1] + " | " + temp[2] + " | " + temp[3] + " | " + temp[4] + " |" + temp[5] + " |";
+    }
+
+    public int compareTo(Station o) {
+        return this.nom.compareTo(o.getNom());
     }
 }
