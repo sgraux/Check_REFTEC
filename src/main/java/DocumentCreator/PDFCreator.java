@@ -28,20 +28,21 @@ import java.util.Date;
  */
 public class PDFCreator {
 
-    private final String pathToOutput = "OutputDir";
+    private static String pathToOutput;
     private static ReftecReader reader;
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
     private static Data data = new Data();
 
-    public  PDFCreator(String parPath)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
-        generatePDF(parPath);
+    public  PDFCreator(String parPathInput, String parPathOutput)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
+        generatePDF(parPathInput, parPathOutput);
+        pathToOutput = parPathOutput;
     }
 
-    public void generatePDF(String parPath) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
+    public void generatePDF(String parPath, String output) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
         Document document = new Document();
         reader = new ReftecReader(parPath);
-        PdfWriter.getInstance(document, new FileOutputStream(pathToOutput + "/ResultExtract.pdf"));
+        PdfWriter.getInstance(document, new FileOutputStream(output + "/ResultExtract.pdf"));
         document.open();
         addTitle(document, reader.getREFTECLigne().getNom());
         document.add(this.createTable());
