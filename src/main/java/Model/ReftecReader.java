@@ -26,9 +26,9 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
         File tempFile = new File(parPathToExtract);
 
         try {
-            System.out.println("--- START ----");
+            System.out.println("--- START ---");
             FileInputStream tempInputStream = new FileInputStream(tempFile);
-            System.out.println("--- READING ----");
+            System.out.println("--- READING ---");
             extract = new XSSFWorkbook(tempInputStream);
         }
         catch(FileNotFoundException e){
@@ -39,6 +39,7 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
         }
         this.read();
         REFTECLigne.display();
+        System.out.println("--- DONE ---");
 
     }
 
