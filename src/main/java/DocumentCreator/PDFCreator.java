@@ -33,6 +33,7 @@ public class PDFCreator {
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
     private static Data data = new Data();
+    private static Boolean generated = false;
 
     public  PDFCreator(String parPathInput, String parPathOutput)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
         generatePDF(parPathInput, parPathOutput);
@@ -40,13 +41,19 @@ public class PDFCreator {
     }
 
     public void generatePDF(String parPath, String output) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
-        Document document = new Document();
-        reader = new ReftecReader(parPath);
-        PdfWriter.getInstance(document, new FileOutputStream(output + "/ResultExtract.pdf"));
-        document.open();
-        addTitle(document, reader.getREFTECLigne().getNom());
-        document.add(this.createTable());
-        document.close();
+        try {
+            Document document = new Document();
+            reader = new ReftecReader(parPath);
+            PdfWriter.getInstance(document, new FileOutputStream(output + "/ResultExtract.pdf"));
+            document.open();
+            addTitle(document, reader.getREFTECLigne().getNom());
+            document.add(this.createTable());
+            document.close();
+            generated = true;
+        }
+        catch (Exception e){
+            generated = false;
+        }
     }
 
     private static void addTitle(Document document, String parString)
@@ -75,13 +82,26 @@ public class PDFCreator {
         addHeader(table, reader.getREFTECLigne().getNom());
 
         ArrayList<String[]> list = reader.getREFTECLigne().retrieve();
+        int totalNonValide = 0;
+        int valide = 0;
         for(String[] tab : list){
             for(int i = 0; i < tab.length; i++){
                 if(i == 0)
                     table.addCell(createStationCell(tab[i]));
                 else
                     table.addCell(createValueCell(tab[i]));
+                try {
+                    if (i != tab.length - 1)
+                        totalNonValide += Integer.parseInt(tab[i]);
+                    else
+                        valide = Integer.parseInt(tab[i]);
+                }
+                catch (NumberFormatException e){}
             }
+            System.out.println("Total non validé : " + totalNonValide);
+            System.out.println("Total validé : " + valide);
+            System.out.println("Ratio validé : " + (valide*100)/(valide+totalNonValide) + "%");
+
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
         table.addCell(createStationCell("Totaux"));
@@ -188,5 +208,9 @@ public class PDFCreator {
             }
         }
 
+    }
+
+    public static Boolean getGenerated() {
+        return generated;
     }
 }
