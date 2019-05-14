@@ -72,8 +72,8 @@ public class PDFCreator {
 
     public static PdfPTable createTable() throws DocumentException {
 
-        // create 6 column table
-        PdfPTable table = new PdfPTable(8);
+        // create 10 column table
+        PdfPTable table = new PdfPTable(10);
 
         // set the width of the table to 100% of page
         table.setWidthPercentage(100);
@@ -98,16 +98,23 @@ public class PDFCreator {
                 }
                 catch (NumberFormatException e){}
             }
-            System.out.println("Total non validé : " + totalNonValide);
-            System.out.println("Total validé : " + valide);
-            System.out.println("Ratio validé : " + (valide*100)/(valide+totalNonValide) + "%");
+            table.addCell(createValueCell(totalNonValide+""));
+            if(valide == 0)
+                table.addCell(createValueCell("0%"));
+            else
+                table.addCell(createValueCell((valide*100)/(valide+totalNonValide) + "%"));
 
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
-        table.addCell(createStationCell("Totaux"));
-        for(int i : tab){
+        PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
+        cellDetail.setColspan(10);
+        Style.headerCellStyle(cellDetail, "NA");
+        table.addCell(cellDetail);
+        /*for(int i : tab){
             table.addCell(createTotalCell(""+i));
         }
+        table.addCell(createTotalCell(totalNonValide+""));
+        table.addCell(createTotalCell((valide*100)/(valide+totalNonValide) + "%"));*/
 
         if(reader.getREFTECLigne().getListeStations().size() == 1){
             addDetailEquipStation(table);
@@ -127,9 +134,11 @@ public class PDFCreator {
         PdfPCell cellE2 = new PdfPCell(new Phrase("Etape 2",font));
         PdfPCell cellE3 = new PdfPCell(new Phrase("Etape 3",font));
         PdfPCell cellValide = new PdfPCell(new Phrase("Validé",font));
+        PdfPCell cellTotalNonValide = new PdfPCell(new Phrase("Total non validé", font));
+        PdfPCell cellRatio = new PdfPCell(new Phrase("Ratio validé", font));
 
-        cellHeader.setColspan(8);
-        cellCodes.setColspan(8);
+        cellHeader.setColspan(10);
+        cellCodes.setColspan(10);
         cellStation.setColspan(2);
         cellNonApp.setColspan(1);
         cellE0.setColspan(1);
@@ -137,6 +146,8 @@ public class PDFCreator {
         cellE2.setColspan(1);
         cellE3.setColspan(1);
         cellValide.setColspan(1);
+        cellTotalNonValide.setColspan(1);
+        cellRatio.setColspan(1);
 
         // set style
         Style.headerCellStyle(cellHeader, parLigne);
@@ -149,6 +160,8 @@ public class PDFCreator {
         Style.headerCellStyle(cellE2, "NA");
         Style.headerCellStyle(cellE3, "NA");
         Style.headerCellStyle(cellValide, "NA");
+        Style.headerCellStyle(cellTotalNonValide, "NA");
+        Style.headerCellStyle(cellRatio, "NA");
 
         // add to table
         parTable.addCell(cellHeader);
@@ -160,6 +173,8 @@ public class PDFCreator {
         parTable.addCell(cellE2);
         parTable.addCell(cellE3);
         parTable.addCell(cellValide);
+        parTable.addCell(cellTotalNonValide);
+        parTable.addCell(cellRatio);
     }
 
     private static PdfPCell createStationCell(String text){
@@ -200,13 +215,32 @@ public class PDFCreator {
 
     private static void addDetailEquipStation(PdfPTable parTable){
 
+        try{
         Station station = reader.getREFTECLigne().getListeStations().get(0);
-        for(String s : data.getListeNomBM()){
-            parTable.addCell(createStationCell(s));
-            for(int i : station.getEtapeBM(s)){
-                parTable.addCell(createValueCell(""+i));
+        int totalNonValide = 0;
+        int valide = 0;
+            for(String s : data.getListeNomBM()){
+                totalNonValide = 0;
+                valide = 0;
+
+                parTable.addCell(createStationCell(s));
+                int[] tempTab = station.getEtapeBM(s);
+                for(int i = 0; i < tempTab.length; i++){
+                    parTable.addCell(createValueCell(""+tempTab[i]));
+                        if (i != 5)
+                            totalNonValide += tempTab[i];
+                        else
+                            valide = tempTab[i];
+                }
+                //System.out.println("Equipement : " + s + " --- valide : " + valide + " --- non valide : " + totalNonValide);
+                parTable.addCell(createValueCell(totalNonValide+""));
+                if(valide == 0)
+                    parTable.addCell(createValueCell("0%"));
+                else
+                    parTable.addCell(createValueCell((valide*100)/(valide+totalNonValide) + "%"));
             }
         }
+        catch (NumberFormatException e){e.printStackTrace();}
 
     }
 
