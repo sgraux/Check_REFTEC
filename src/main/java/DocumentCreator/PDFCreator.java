@@ -28,25 +28,28 @@ import java.util.Date;
  */
 public class PDFCreator {
 
-    private static String pathToOutput;
     private static ReftecReader reader;
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
             Font.BOLD);
     private static Data data = new Data();
     private static Boolean generated = false;
+    private static String fileName;
 
-    public  PDFCreator(String parPathInput, String parPathOutput)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
-        generatePDF(parPathInput, parPathOutput);
-        pathToOutput = parPathOutput;
+    public  PDFCreator(String parPathInput, String parPathOutput, String parVerificationStep)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
+        generatePDF(parPathInput, parPathOutput, parVerificationStep);
     }
 
-    public void generatePDF(String parPath, String output) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
+    public void generatePDF(String parPath, String output, String parVerificationStep) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
         try {
             Document document = new Document();
             reader = new ReftecReader(parPath);
-            PdfWriter.getInstance(document, new FileOutputStream(output + "/ResultExtract.pdf"));
+
+            String extractName = reader.getREFTECLigne().getNom()+"_"+reader.getREFTECLigne().getListeStations().get(0).getNom();
+            this.fileName = "/Extract_" + extractName + ".pdf";
+
+            PdfWriter.getInstance(document, new FileOutputStream(output + fileName));
             document.open();
-            addTitle(document, reader.getREFTECLigne().getNom());
+            addTitle(document, extractName + " --- " + parVerificationStep);
             document.add(this.createTable());
             document.close();
             generated = true;
@@ -58,7 +61,7 @@ public class PDFCreator {
 
     private static void addTitle(Document document, String parString)
             throws DocumentException {
-        Paragraph title = new Paragraph("Extract REFTEC "+ parString + " --- " + new Date(), catFont);
+        Paragraph title = new Paragraph(parString, catFont);
         title.setAlignment(Element.ALIGN_CENTER);
         addEmptyLine(title, 3);
         document.add(title);
@@ -101,8 +104,9 @@ public class PDFCreator {
             table.addCell(createValueCell(totalNonValide+""));
             if(valide == 0)
                 table.addCell(createValueCell("0%"));
-            else
-                table.addCell(createValueCell((valide*100)/(valide+totalNonValide) + "%"));
+            else {
+                table.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
+            }
 
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
@@ -110,11 +114,6 @@ public class PDFCreator {
         cellDetail.setColspan(10);
         Style.headerCellStyle(cellDetail, "NA");
         table.addCell(cellDetail);
-        /*for(int i : tab){
-            table.addCell(createTotalCell(""+i));
-        }
-        table.addCell(createTotalCell(totalNonValide+""));
-        table.addCell(createTotalCell((valide*100)/(valide+totalNonValide) + "%"));*/
 
         if(reader.getREFTECLigne().getListeStations().size() == 1){
             addDetailEquipStation(table);
@@ -232,12 +231,11 @@ public class PDFCreator {
                         else
                             valide = tempTab[i];
                 }
-                //System.out.println("Equipement : " + s + " --- valide : " + valide + " --- non valide : " + totalNonValide);
                 parTable.addCell(createValueCell(totalNonValide+""));
                 if(valide == 0)
                     parTable.addCell(createValueCell("0%"));
                 else
-                    parTable.addCell(createValueCell((valide*100)/(valide+totalNonValide) + "%"));
+                    parTable.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
             }
         }
         catch (NumberFormatException e){e.printStackTrace();}
@@ -246,5 +244,9 @@ public class PDFCreator {
 
     public static Boolean getGenerated() {
         return generated;
+    }
+
+    public static String getFileName() {
+        return fileName;
     }
 }
