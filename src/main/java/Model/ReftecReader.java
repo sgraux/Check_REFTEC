@@ -20,7 +20,6 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
     private Ligne REFTECLigne;
     private Data data = new Data();
 
-
     public ReftecReader(String parPathToExtract){
 
         File tempFile = new File(parPathToExtract);
@@ -38,12 +37,12 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
             System.out.println("io exception");
         }
         this.read();
-        REFTECLigne.display();
+        //REFTECLigne.display();
         System.out.println("--- DONE ---");
-
     }
 
     public void read(){
+        //TODO: add grille, ascenseur, EM, superviseur
         Iterator<Row> rowIterator = extract.getSheetAt(0).iterator();
 
         rowIterator.next(); //Retire les 5 premières lignes

@@ -71,9 +71,9 @@ public class Station implements Comparable<Station>{
 
         for(int i = 0; i < 6; i++) res[i] = 0;
 
-        if(familleBM.equals("Armoires")) res = this.getEtapeCodeBM("ARFO");
+        if(familleBM.equals("Armoires Fortes")) res = this.getEtapeCodeBM("ARFO");
 
-        else if(familleBM.equals("Centrales")){
+        else if(familleBM.equals("Centrales d'alarmes")){
             for(int i = 0; i < data.getCentrales().length; i++){
                 temp = this.getEtapeCodeBM(data.getCentrales()[i]);
                 for(int j = 0; j < temp.length; j ++){
@@ -105,9 +105,46 @@ public class Station implements Comparable<Station>{
                 }
             }
         }
+
         else if(familleBM.equals("Interphones")){
             for(int i = 0; i < data.getPhones().length; i++){
                 temp = this.getEtapeCodeBM(data.getPhones()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+
+        else if(familleBM.equals("Superviseur")){
+            for(int i = 0; i < data.getSuperviseur().length; i++){
+                temp = this.getEtapeCodeBM(data.getSuperviseur()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+
+        else if(familleBM.equals("Commande à distance escalier mécanique et trottoir roulant")){
+            for(int i = 0; i < data.getEscalierMecaniqueEtTrottoir().length; i++){
+                temp = this.getEtapeCodeBM(data.getEscalierMecaniqueEtTrottoir()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+
+        else if(familleBM.equals("Commande à distance ascenseur")){
+            for(int i = 0; i < data.getAscenseur().length; i++){
+                temp = this.getEtapeCodeBM(data.getAscenseur()[i]);
+                for(int j = 0; j < temp.length; j ++){
+                    res[j] += temp[j];
+                }
+            }
+        }
+
+        else if(familleBM.equals("Commande à distance grilles et fermeture automatique")){
+            for(int i = 0; i < data.getGrillesEtFermeture().length; i++){
+                temp = this.getEtapeCodeBM(data.getGrillesEtFermeture()[i]);
                 for(int j = 0; j < temp.length; j ++){
                     res[j] += temp[j];
                 }

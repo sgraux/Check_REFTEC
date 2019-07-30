@@ -6,13 +6,17 @@ public class Data {
     private final int getNumeroColonneLieu = 4;
     private final int getNumeroColonneFamille = 8;
 
-    private final String[] listeBM = {"ARFO","CEAS", "PEAS", "DEAS","PEAL","ARTS", "MITS", "RTIP", "RTCL", "TSONO","ARVS", "CAVS", "RAVS", "MOVS","SONO", "SONOR", "PUPI", "PUSO", "HPSO","IVOY", "IVDO", "PUIN", "BUIN", "CAIN", "BMIN", "MPIN"};
-    private final String[] listeNomBM = {"Armoires", "Centrales", "Telesonorisation", "Caméras", "Sonorisation", "Interphones"};
+    private final String[] listeBM = {"ARFO","CEAS", "PEAS", "DEAS","PEAL","ARTS", "MITS", "RTIP", "RTCL", "TSONO","ARVS", "CAVS", "RAVS", "MOVS","SONO", "SONOR", "PUPI", "PUSO", "HPSO","IVOY", "IVDO", "PUIN", "BUIN", "CAIN", "BMIN", "MPIN","MISC", "SCESU","CNI", "FUJ", "KON", "O.K", "OTI", "SCH", "SPEC", "THY", "PALE","A000","A001", "A002", "A003", "A004", "A005", "A007","BL", "BR", "CI", "GC", "GLE", "GR", "GVP", "PB", "PBH", "PTEBV", "PTEC", "PTLBV", "PTLC", "RM", "VR", "VRA", "GS"};
+    private final String[] listeNomBM = {"Armoires Fortes", "Centrales d'alarmes", "Telesonorisation", "Caméras", "Sonorisation", "Interphones", "Superviseur", "Commande à distance escalier mécanique et trottoir roulant", "Commande à distance ascenseur", "Commande à distance grilles et fermeture automatique"};
     private final String[] centrales = {"CEAS", "PEAS", "DEAS","PEAL"};
     private final String[] telesono = {"ARTS", "MITS", "RTIP", "RTCL", "TSONO"};
     private final String[] video = {"ARVS", "CAVS", "RAVS", "MOVS"};
     private final String[] son = {"SONO", "SONOR", "PUPI", "PUSO", "HPSO"};
     private final String[] phones = {"IVOY", "IVDO", "PUIN", "BUIN", "CAIN", "BMIN", "MPIN"};
+    private final String[] superviseur = {"MISC", "SCESU"};
+    private final String[] escalierMecaniqueEtTrottoir = {"CNI", "FUJ", "KON", "O.K", "OTI", "SCH", "SPEC", "THY", "PALE"};
+    private final String[] ascenseur = {"A000","A001", "A002", "A003", "A004", "A005", "A007"};
+    private final String[] grillesEtFermeture = {"BL", "BR", "CI", "GC", "GLE", "GR", "GVP", "PB", "PBH", "PTEBV", "PTEC", "PTLBV", "PTLC", "RM", "VR", "VRA", "GS"};
 
     private final int[] m01RGB ={255,255,77};
     //private final String[] m02RGB;
@@ -72,13 +76,22 @@ public class Data {
             res += s + " ";
         }
 
-        res += "\nSonorisation : ";
-        for(String s : son){
+        res += "\nSuperviseur :";
+        for(String s : superviseur){
             res += s + " ";
         }
 
-        res += "\nInterphones : ";
-        for(String s : phones){
+        res += "\nEscaliers mécaniques et trottoirs : ";
+        for(String s : escalierMecaniqueEtTrottoir){
+            res += s + " ";
+        }
+
+        res += "\nAscenseur : ";
+        for(String s : ascenseur){
+            res += s + " ";
+        }
+        res += "\nGrilles et Fermetures : ";
+        for(String s : grillesEtFermeture){
             res += s + " ";
         }
 
@@ -119,6 +132,22 @@ public class Data {
 
     public String[] getPhones() {
         return phones;
+    }
+
+    public String[] getSuperviseur() {
+        return superviseur;
+    }
+
+    public String[] getEscalierMecaniqueEtTrottoir() {
+        return escalierMecaniqueEtTrottoir;
+    }
+
+    public String[] getAscenseur() {
+        return ascenseur;
+    }
+
+    public String[] getGrillesEtFermeture() {
+        return grillesEtFermeture;
     }
 
     public int[] getM01RGB() {

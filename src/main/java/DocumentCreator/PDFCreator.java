@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 
 import Data.Data;
+import Model.EquipementSI;
+import Model.Ligne;
 import Model.ReftecReader;
 import Model.Station;
 import com.itextpdf.text.*;
@@ -35,22 +37,41 @@ public class PDFCreator {
     private static Boolean generated = false;
     private static String fileName;
 
-    public  PDFCreator(String parPathInput, String parPathOutput, String parVerificationStep)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
-        generatePDF(parPathInput, parPathOutput, parVerificationStep);
+    public  PDFCreator(String parPathInput, String parPathOutput, String parVerificationStep, String parMode)throws FileNotFoundException, DocumentException, MalformedURLException, Exception{
+            generatePDF(parPathInput, parPathOutput, parVerificationStep, parMode);
     }
 
-    public void generatePDF(String parPath, String output, String parVerificationStep) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
+    public void generatePDF(String parPath, String output, String parVerificationStep, String parMode) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
         try {
             Document document = new Document();
             reader = new ReftecReader(parPath);
+            String title;
 
-            String extractName = reader.getREFTECLigne().getNom()+"_"+reader.getREFTECLigne().getListeStations().get(0).getNom();
-            this.fileName = "/Extract_" + extractName + ".pdf";
+            if(parMode.equals("Mode station")) {
+                String extractName = reader.getREFTECLigne().getNom() + "_" + reader.getREFTECLigne().getListeStations().get(0).getNom();
+                this.fileName = "/Extract_" + extractName + "_" + parVerificationStep + ".pdf";
+                title = extractName + " --- " + parVerificationStep;
+            }
+            else {
+                Ligne ligneCourante = reader.getREFTECLigne();
+                if(parMode.equals("Mode ligne")) {
+                    this.fileName = "/Extract_Mode Ligne_" + ligneCourante.getNom() + ".pdf";
+                    title = "Mode ligne --- " + ligneCourante.getNom();
+                }
+                else{
+                    this.fileName = "/Extract_Mode Ligne Détails_" + ligneCourante.getNom() + ".pdf";
+                    title = "Mode ligne Détails --- " + ligneCourante.getNom();
+                }
+            }
 
             PdfWriter.getInstance(document, new FileOutputStream(output + fileName));
             document.open();
-            addTitle(document, extractName + " --- " + parVerificationStep);
-            document.add(this.createTable());
+            addTitle(document, title);
+            document.add(this.createTable(parMode));
+
+            document.add(new Paragraph(""));
+            document.add(new Phrase("(*) La colonne \"non applicable\" est affichée à titre informatif. Elle n'est pas prise en compte dans le ratio de validation."));
+
             document.close();
             generated = true;
         }
@@ -73,7 +94,7 @@ public class PDFCreator {
         }
     }
 
-    public static PdfPTable createTable() throws DocumentException {
+    public static PdfPTable createTable(String parMode) throws DocumentException {
 
         // create 10 column table
         PdfPTable table = new PdfPTable(10);
@@ -81,42 +102,77 @@ public class PDFCreator {
         // set the width of the table to 100% of page
         table.setWidthPercentage(100);
 
-        //TODO: add real values
         addHeader(table, reader.getREFTECLigne().getNom());
 
         ArrayList<String[]> list = reader.getREFTECLigne().retrieve();
         int totalNonValide = 0;
         int valide = 0;
+
+        int compteur = 0;
+        int sommePourcentage = 0;
+
         for(String[] tab : list){
+            totalNonValide = 0;
+            valide = 0;
             for(int i = 0; i < tab.length; i++){
                 if(i == 0)
                     table.addCell(createStationCell(tab[i]));
                 else
                     table.addCell(createValueCell(tab[i]));
                 try {
-                    if (i != tab.length - 1)
-                        totalNonValide += Integer.parseInt(tab[i]);
+                    if (i != tab.length - 1) {
+                        if (i != 1) {
+                            totalNonValide += Integer.parseInt(tab[i]);
+                        }
+                    }
                     else
                         valide = Integer.parseInt(tab[i]);
                 }
                 catch (NumberFormatException e){}
             }
             table.addCell(createValueCell(totalNonValide+""));
-            if(valide == 0)
-                table.addCell(createValueCell("0%"));
-            else {
-                table.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
-            }
 
+            if(totalNonValide == 0){
+                table.addCell(createValueCell("100%"));
+                sommePourcentage  += 100;
+            }
+            else {
+                if(valide == 0) {
+                    table.addCell(createValueCell("0%"));
+                }
+                else {
+                    table.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
+                    sommePourcentage += (float) (valide * 100) / (valide + totalNonValide);
+                }
+            }
+            if(parMode.equals("Mode ligne détails")) {
+                PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
+                cellDetail.setColspan(10);
+                Style.headerCellStyle(cellDetail, "NA");
+                table.addCell(cellDetail);
+                addDetailEquipStation(table, reader.getREFTECLigne().getListeStations().get(compteur));
+                compteur++;
+                PdfPCell cellBlank = new PdfPCell(new Phrase("", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
+                cellBlank.setColspan(10);
+                Style.headerCellStyle(cellBlank, "NA");
+                table.addCell(cellBlank);
+            }
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
-        PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
-        cellDetail.setColspan(10);
-        Style.headerCellStyle(cellDetail, "NA");
-        table.addCell(cellDetail);
 
-        if(reader.getREFTECLigne().getListeStations().size() == 1){
-            addDetailEquipStation(table);
+        if(parMode.equals("Mode station")){
+            PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
+            cellDetail.setColspan(10);
+            Style.headerCellStyle(cellDetail, "NA");
+            table.addCell(cellDetail);
+            addDetailEquipStation(table, reader.getREFTECLigne().getListeStations().get(0));
+        }
+        else {
+            PdfPCell cellRatioLigne = new PdfPCell(new Phrase("--- Ratio complétude des données de supervision "+reader.getREFTECLigne().getNom()+" ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
+            cellRatioLigne.setColspan(9);
+            Style.headerCellStyle(cellRatioLigne, reader.getREFTECLigne().getNom());
+            table.addCell(cellRatioLigne);
+            table.addCell(createStationCell( sommePourcentage / reader.getREFTECLigne().getListeStations().size() + "%"));
         }
         return table;
     }
@@ -127,7 +183,7 @@ public class PDFCreator {
         PdfPCell cellHeader = new PdfPCell(new Phrase("Extract REFTEC ligne : " + parLigne,font));
         PdfPCell cellCodes = new PdfPCell(new Phrase(data.toStringCodesParEquip(),font));
         PdfPCell cellStation = new PdfPCell(new Phrase("Station",font));
-        PdfPCell cellNonApp = new PdfPCell(new Phrase("Non Applicable",font));
+        PdfPCell cellNonApp = new PdfPCell(new Phrase("Non Applicable (*)",font));
         PdfPCell cellE0 = new PdfPCell(new Phrase("Etape 0",font));
         PdfPCell cellE1 = new PdfPCell(new Phrase("Etape 1",font));
         PdfPCell cellE2 = new PdfPCell(new Phrase("Etape 2",font));
@@ -212,10 +268,10 @@ public class PDFCreator {
         return cell;
     }
 
-    private static void addDetailEquipStation(PdfPTable parTable){
+    private static void addDetailEquipStation(PdfPTable parTable, Station parStation){
 
         try{
-        Station station = reader.getREFTECLigne().getListeStations().get(0);
+        Station station = parStation;
         int totalNonValide = 0;
         int valide = 0;
             for(String s : data.getListeNomBM()){
@@ -226,16 +282,24 @@ public class PDFCreator {
                 int[] tempTab = station.getEtapeBM(s);
                 for(int i = 0; i < tempTab.length; i++){
                     parTable.addCell(createValueCell(""+tempTab[i]));
-                        if (i != 5)
-                            totalNonValide += tempTab[i];
+                        if (i != 5) {
+                            if (i != 0) {
+                                totalNonValide += tempTab[i];
+                            }
+                        }
                         else
                             valide = tempTab[i];
                 }
                 parTable.addCell(createValueCell(totalNonValide+""));
-                if(valide == 0)
-                    parTable.addCell(createValueCell("0%"));
-                else
-                    parTable.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
+                if(totalNonValide == 0){
+                    parTable.addCell(createValueCell("100%"));
+                }
+                else{
+                    if (valide == 0)
+                        parTable.addCell(createValueCell("0%"));
+                    else
+                        parTable.addCell(createValueCell((float) (valide * 100) / (valide + totalNonValide) + "%"));
+                }
             }
         }
         catch (NumberFormatException e){e.printStackTrace();}

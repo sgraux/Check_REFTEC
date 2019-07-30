@@ -15,6 +15,7 @@ public class MainPanel extends JPanel implements ActionListener {
     private String absoluteInputPath;
     private String absoluteOutputPath;
     private String[] tabSteps = {"J-30 Pré-OPR", "J-7 RO", "J+30 RO"};
+    private String[] tabMode = {"Mode station", "Mode ligne", "Mode ligne détails"};
     private PDFCreator creator;
 
     private final JLabel labelSelectInput = new JLabel("Selectionner un extract REFTEC : (format .xlsx) ");
@@ -28,6 +29,7 @@ public class MainPanel extends JPanel implements ActionListener {
     private JLabel labelComboBoxSteps = new JLabel("Choisir une étape de vérification :");
     private JComboBox comboBoxSteps = new JComboBox(tabSteps);
 
+    private JComboBox comboBoxMode = new JComboBox(tabMode);
     private JButton buttonValidate = new JButton("Valider");
 
     public MainPanel() throws Exception{
@@ -48,6 +50,7 @@ public class MainPanel extends JPanel implements ActionListener {
         this.add(labelComboBoxSteps);
         this.add(comboBoxSteps);
 
+        this.add(comboBoxMode);
         this.add(buttonValidate);
         buttonValidate.addActionListener(this);
 
@@ -94,7 +97,7 @@ public class MainPanel extends JPanel implements ActionListener {
             }
             else {
                 try {
-                    creator = new PDFCreator(absoluteInputPath, absoluteOutputPath,comboBoxSteps.getSelectedItem().toString());
+                    creator = new PDFCreator(absoluteInputPath, absoluteOutputPath,comboBoxSteps.getSelectedItem().toString(), comboBoxMode.getSelectedItem().toString());
                     if(creator.getGenerated()) {
                         JOptionPane.showMessageDialog(this.getParent(), "Rapport généré ! \n Localisation : " + absoluteOutputPath + "\\" + creator.getFileName(), "Rapport généré",JOptionPane.INFORMATION_MESSAGE);
                         System.exit(0);
