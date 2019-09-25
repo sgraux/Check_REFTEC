@@ -1,13 +1,19 @@
 package Data;
 
-public class Data {
+public class Data { //Classe contenant les données utilisées par l'outil
 
     private final int numeroColonneLigne = 3;
     private final int getNumeroColonneLieu = 4;
     private final int getNumeroColonneFamille = 8;
 
+    //Liste des codes de famille d'équipement
     private final String[] listeBM = {"ARFO","CEAS", "PEAS", "DEAS","PEAL","ARTS", "MITS", "RTIP", "RTCL", "TSONO","ARVS", "CAVS", "RAVS", "MOVS","SONO", "SONOR", "PUPI", "PUSO", "HPSO","IVOY", "IVDO", "PUIN", "BUIN", "CAIN", "BMIN", "MPIN","MISC", "SCESU","CNI", "FUJ", "KON", "O.K", "OTI", "SCH", "SPEC", "THY", "PALE","A000","A001", "A002", "A003", "A004", "A005", "A007","BL", "BR", "CI", "GC", "GLE", "GR", "GVP", "PB", "PBH", "PTEBV", "PTEC", "PTLBV", "PTLC", "RM", "VR", "VRA", "GS"};
+
+    //Liste des noms de famille d'équipement
     private final String[] listeNomBM = {"Armoires Fortes", "Centrales d'alarmes", "Telesonorisation", "Caméras", "Sonorisation", "Interphones", "Superviseur", "Commande à distance escalier mécanique et trottoir roulant", "Commande à distance ascenseur", "Commande à distance grilles et fermeture automatique"};
+
+    //Listes des codes d'équipement par famille
+    //Une liste de code par famille
     private final String[] centrales = {"CEAS", "PEAS", "DEAS","PEAL"};
     private final String[] telesono = {"ARTS", "MITS", "RTIP", "RTCL", "TSONO"};
     private final String[] video = {"ARVS", "CAVS", "RAVS", "MOVS"};
@@ -33,7 +39,7 @@ public class Data {
     private final int[] m13RGB ={153,255,255};
 
 
-    public int[] getRGB(String parLigne){
+    public int[] getRGB(String parLigne){ //Retourne la couleur associé à la ligne passée en argument
         if(parLigne.equals("M01")) return m01RGB;
         else if(parLigne.equals("M03")) return m03RGB;
         else if(parLigne.equals("M04")) return m04RGB;
@@ -41,13 +47,15 @@ public class Data {
         else return null;
     }
 
-    public boolean estDansBM(String parBM){
+    public boolean estDansBM(String parBM){// indique si le code passé en argument fait partie de la liste des codes surveillés
         for(int i = 0; i < listeBM.length; i++){
             if(listeBM[i].equals(parBM)) return true;
         }
         return false;
     }
 
+
+    //Getter, Setter et ToString
     public String toStringCodes(){
         String res = "[ ";
         for(int i = 0; i < listeBM.length; i++){

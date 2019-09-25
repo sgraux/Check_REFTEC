@@ -105,6 +105,7 @@ public class ReftecReader { //Effectue la lecture d'un extract REFTEC au format 
         System.out.println(testCountRows);
     }
 
+    //Getters et setters
     public XSSFWorkbook getExtract() {
         return extract;
     }

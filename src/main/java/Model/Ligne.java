@@ -2,27 +2,28 @@ package Model;
 
 import java.util.ArrayList;
 
-public class Ligne {
+public class Ligne {//Décris une ligne
 
-    private String nom;
-    private ArrayList<Station> listeStations;
+    private String nom; //Nom de la ligne
+    private ArrayList<Station> listeStations;//Liste des stations présentent sur la ligne
 
     public Ligne(String parNom){
         this.nom = parNom;
         listeStations = new ArrayList<Station>();
     }
 
+    //Gère les stations
     public void manageLieu(String parLieu, String parFamilleBM, String parStatut){
         boolean found = false;
 
-        for(Station s : listeStations){
+        for(Station s : listeStations){//Si la station fait partie de la liste, on lui passe l'équipement à gérer
             if(s.getNom().equals(parLieu)){
                 s.manageBM(parFamilleBM, parStatut);
                 found = true;
             }
         }
 
-        if(!found){
+        if(!found){//Sinon, on créer la station et on lui passe l'équipement à gérer
             Station s = new Station(parLieu);
             s.manageBM(parFamilleBM, parStatut);
             listeStations.add(s);
@@ -30,6 +31,7 @@ public class Ligne {
 
     }
 
+    //ToString avec affichage
     public void display(){
         String toDisplay = " --- " + nom + " --- \nStation | Non Applicable | Etape 0 | Etape 1 | Etape 2 | Etape 3 | Validé |\n";
         for(Station s : listeStations){
@@ -38,6 +40,7 @@ public class Ligne {
         System.out.println(toDisplay);
     }
 
+    //Donne une liste contenant les informations de chaque station de la ligne
     public ArrayList<String[]> retrieve(){
         ArrayList<String[]> list = new ArrayList<String[]>();
         int[] tempSomme = {};
@@ -70,6 +73,7 @@ public class Ligne {
         return tabSommeEtapeStations;
     }
 
+    //Getters et setters
     public String getNom() {
         return nom;
     }

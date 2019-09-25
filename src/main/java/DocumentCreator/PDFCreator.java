@@ -28,7 +28,7 @@ import java.util.Date;
  * @author Sean Graux
  * @version 1.0
  */
-public class PDFCreator {
+public class PDFCreator { //Classe qui créer le pdf contenant le tableau de suivi
 
     private static ReftecReader reader;
     private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
@@ -41,6 +41,7 @@ public class PDFCreator {
             generatePDF(parPathInput, parPathOutput, parVerificationStep, parMode);
     }
 
+    //Créer le pdf à l'emplacement indiqué par output
     public void generatePDF(String parPath, String output, String parVerificationStep, String parMode) throws FileNotFoundException, DocumentException, MalformedURLException, Exception {
         try {
             Document document = new Document();
@@ -64,11 +65,13 @@ public class PDFCreator {
                 }
             }
 
+            //Ouverture du document et appel de la méthode d'ajout du contenu
             PdfWriter.getInstance(document, new FileOutputStream(output + fileName));
             document.open();
             addTitle(document, title);
             document.add(this.createTable(parMode));
 
+            //Ajout d'une précision sur la colone non applicable
             document.add(new Paragraph(""));
             document.add(new Phrase("(*) La colonne \"non applicable\" est affichée à titre informatif. Elle n'est pas prise en compte dans le ratio de validation."));
 
@@ -80,6 +83,7 @@ public class PDFCreator {
         }
     }
 
+    //Ajoute un titre au pdf passé en argument
     private static void addTitle(Document document, String parString)
             throws DocumentException {
         Paragraph title = new Paragraph(parString, catFont);
@@ -88,12 +92,14 @@ public class PDFCreator {
         document.add(title);
     }
 
+    //Ajoute une ligne vide dans le document passé en argument
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));
         }
     }
 
+    //Ajoute le tableau contenant toutes les informations du suivi
     public static PdfPTable createTable(String parMode) throws DocumentException {
 
         // create 10 column table
@@ -104,6 +110,7 @@ public class PDFCreator {
 
         addHeader(table, reader.getREFTECLigne().getNom());
 
+        //Récupère les données lues par le REFTEC Reader
         ArrayList<String[]> list = reader.getREFTECLigne().retrieve();
         int totalNonValide = 0;
         int valide = 0;
@@ -111,11 +118,12 @@ public class PDFCreator {
         int compteur = 0;
         int sommePourcentage = 0;
 
+        //Parcours la liste des données et les place dans le tableau
         for(String[] tab : list){
             totalNonValide = 0;
             valide = 0;
             for(int i = 0; i < tab.length; i++){
-                if(i == 0)
+                if(i == 0) //Style différent pour le nom de station
                     table.addCell(createStationCell(tab[i]));
                 else
                     table.addCell(createValueCell(tab[i]));
@@ -145,6 +153,7 @@ public class PDFCreator {
                     sommePourcentage += (float) (valide * 100) / (valide + totalNonValide);
                 }
             }
+            //En mode ligne détails on ajoute tout les détails de toutes les stations de la ligne
             if(parMode.equals("Mode ligne détails")) {
                 PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
                 cellDetail.setColspan(10);
@@ -160,6 +169,7 @@ public class PDFCreator {
         }
         int[] tab = reader.getREFTECLigne().getSommeEtapeStations();
 
+        //en mode station on donne les détails pour la station donnée
         if(parMode.equals("Mode station")){
             PdfPCell cellDetail = new PdfPCell(new Phrase("--- Détails équipements ---", new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK)));
             cellDetail.setColspan(10);
@@ -177,6 +187,7 @@ public class PDFCreator {
         return table;
     }
 
+    //Ajoute le un header au tableau (titre, codes de famille d'équipement et entêtes de colonnes)
     public static void addHeader(PdfPTable parTable, String parLigne){
         Font font = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.BLACK);
         // create header cell
@@ -232,6 +243,7 @@ public class PDFCreator {
         parTable.addCell(cellRatio);
     }
 
+    //Création de cellules dans le tableau avec des styles différents
     private static PdfPCell createStationCell(String text){
         // font
         Font font = new Font(FontFamily.HELVETICA, 8, Font.BOLD, BaseColor.BLACK);
@@ -268,6 +280,7 @@ public class PDFCreator {
         return cell;
     }
 
+    //Ajoute les détails par famille d'équipement de la station passée en argument
     private static void addDetailEquipStation(PdfPTable parTable, Station parStation){
 
         try{
@@ -306,6 +319,7 @@ public class PDFCreator {
 
     }
 
+    //Getter
     public static Boolean getGenerated() {
         return generated;
     }

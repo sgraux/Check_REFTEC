@@ -5,7 +5,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.pdf.PdfPCell;
 
-public class Style {
+public class Style {//Gère le style des cellules du tableau
 
     private static Data data = new Data();
 

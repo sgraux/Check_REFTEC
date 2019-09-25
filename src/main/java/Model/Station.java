@@ -5,7 +5,7 @@ import Data.Data;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Station implements Comparable<Station>{
+public class Station implements Comparable<Station>{ //Décris une station
 
     private String nom;
     private ArrayList<EquipementSI> listeEquipementSI;
@@ -16,6 +16,7 @@ public class Station implements Comparable<Station>{
         listeEquipementSI = new ArrayList<EquipementSI>();
     }
 
+    //Gère les équipements
     public void manageBM(String parBM, String parStatut){
         if(data.estDansBM(parBM)) {
             boolean found = false;
@@ -35,6 +36,8 @@ public class Station implements Comparable<Station>{
 
     }
 
+
+    //Getters et Setters
     public int[] getSommeEtapeEquip(){ //Retourne un tableau de taille 6 contenant la somme du nombre d'équipement pour chaque étape
         int[] tabSommeEtapeEquip = new int[6];
         Iterator<EquipementSI> iterator = listeEquipementSI.iterator();

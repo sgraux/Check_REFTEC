@@ -1,8 +1,9 @@
 package Model;
 
-public class EquipementSI {
+public class EquipementSI { //Décris une famille d'équipement
 
-    private String codeBM;
+    private String codeBM; //Nom de la famille de l'équipement
+    //Nombres d'équipement dans chaque étape du workflow REFTEC
     private int nbNonApplicable;
     private int nbE0;
     private int nbE1;
@@ -20,6 +21,7 @@ public class EquipementSI {
         nbValide = 0;
     }
 
+    //Permet de mettre à jour les nombres d'équipements
     public void manageStatut(String parStatut){
         if(parStatut.equals("Non Applicable")) nbNonApplicable++;
         else if(parStatut.equals("Etape 0")) nbE0++;
@@ -29,6 +31,7 @@ public class EquipementSI {
         else if(parStatut.equals("Validé")) nbValide++;
     }
 
+    //Getter et setters
     public int[] getTabEtape(){
         int[] tab = {nbNonApplicable, nbE0, nbE1, nbE2, nbE3, nbValide};
         return tab;

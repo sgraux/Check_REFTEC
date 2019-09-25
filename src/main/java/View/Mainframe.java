@@ -2,7 +2,7 @@ package View;
 
 import javax.swing.*;
 
-public class Mainframe extends JFrame {
+public class Mainframe extends JFrame {//Fenêtre mère de l'IHM
 
     public Mainframe()throws Exception{
         this.setTitle("REFTEC READER");

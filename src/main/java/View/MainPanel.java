@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class MainPanel extends JPanel implements ActionListener {
+public class MainPanel extends JPanel implements ActionListener {//Panel de L'IHM
 
     private String absoluteInputPath;
     private String absoluteOutputPath;
