@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
+public class ReftecReader { //Effectue la lecture d'un extract REFTEC au format .xlsx
 
     private XSSFWorkbook extract;
     private Ligne REFTECLigne;
@@ -42,10 +42,9 @@ public class ReftecReader { //Lit un extract REFTEC pour une ligne donnée
     }
 
     public void read(){
-        //TODO: add grille, ascenseur, EM, superviseur
         Iterator<Row> rowIterator = extract.getSheetAt(0).iterator();
 
-        rowIterator.next(); //Retire les 5 premières lignes
+        rowIterator.next(); //Retire les 5 premières lignes qui contiennent des données inutiles
         rowIterator.next();
         rowIterator.next();
         rowIterator.next();

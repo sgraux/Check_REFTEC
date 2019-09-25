@@ -100,7 +100,11 @@ public class MainPanel extends JPanel implements ActionListener {
                     creator = new PDFCreator(absoluteInputPath, absoluteOutputPath,comboBoxSteps.getSelectedItem().toString(), comboBoxMode.getSelectedItem().toString());
                     if(creator.getGenerated()) {
                         JOptionPane.showMessageDialog(this.getParent(), "Rapport généré ! \n Localisation : " + absoluteOutputPath + "\\" + creator.getFileName(), "Rapport généré",JOptionPane.INFORMATION_MESSAGE);
-                        System.exit(0);
+                        //System.exit(0);
+                        absoluteOutputPath = "";
+                        absoluteOutputPath = "";
+                        fieldInputPath.setText("");
+                        fieldOutputPath.setText("");
                     }
                     else {
                         JOptionPane.showMessageDialog(this.getParent(),
