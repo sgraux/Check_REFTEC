@@ -44,7 +44,7 @@ public class Data { //Classe contenant les données utilisées par l'outil
         else if(parLigne.equals("M03")) return m03RGB;
         else if(parLigne.equals("M04")) return m04RGB;
         else if(parLigne.equals("M13")) return m13RGB;
-        else return null;
+        else return new int[]{255,255,255};
     }
 
     public boolean estDansBM(String parBM){// indique si le code passé en argument fait partie de la liste des codes surveillés
